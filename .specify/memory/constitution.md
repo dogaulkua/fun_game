@@ -1,50 +1,72 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+Version change: none -> 1.0.0
+Modified principles: added five core principles to define project governance
+Added sections: Additional Constraints, Development Workflow
+Removed sections: none
+Templates requiring updates:
+- ✅ .specify/templates/plan-template.md (aligned)
+- ✅ .specify/templates/spec-template.md (aligned)
+- ✅ .specify/templates/tasks-template.md (aligned)
+- ⚠ .specify/templates/commands/* (no command templates present)
+Follow-up TODOs: none
+-->
+
+# Project Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Clarity First
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Requirements MUST be expressed as independent, testable outcomes.
+Every feature spec, plan, and task MUST map to clear acceptance criteria.
+Unresolved questions MUST be labeled explicitly and resolved before implementation.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. User-Centric Delivery
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Every increment MUST deliver observable value to users or stakeholders.
+Work MUST be organized by user-facing outcomes before technology choices.
+Scope decisions MUST be guided by real user impact and explicit success criteria.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Quality Discipline
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Automated tests, peer review, and documented reasoning are non-negotiable.
+Changes MUST preserve or improve maintainability, observability, and reliability.
+Defects and regressions MUST be tracked and addressed before feature sign-off.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Iteration and Feedback
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Work MUST be delivered in small, validated increments.
+Plans and specifications MUST be updated based on feedback, not assumptions.
+Large decisions MUST be broken into hypotheses and validated early.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Minimal Complexity
+
+Solutions MUST be as simple as possible for the problem being solved.
+Complexity MUST be justified by measurable benefit.
+Avoid building unnecessary infrastructure, features, or abstractions.
+
+## Additional Constraints
+
+Technology choices MUST prioritize rapid delivery, maintainability, and long-term support.
+Dependencies MUST be reviewed for stability, licensing, and security.
+Security and accessibility MUST be assessed at the earliest design stage.
+
+## Development Workflow
+
+All work MUST flow through documented branches, reviews, and approval gates.
+Changes MUST be accompanied by a plan, spec, tasks, and evidence of testing.
+Merge decisions MUST verify alignment with this constitution and explicit acceptance criteria.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes informal practices. Compliance is required for all new work.
+Amendments require a written rationale, review by the core team, and updated documentation in `.specify/memory/constitution.md`.
+Versioning follows semantic versioning:
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+- MAJOR for governance changes that alter principles or remove sections.
+- MINOR for new principles, mandatory sections, or material process expansions.
+- PATCH for wording clarifications, typos, and non-semantic refinements.
+  Constitution reviews MUST occur before major milestones and when process gaps emerge.
+
+**Version**: 1.0.0 | **Ratified**: 2026-05-03 | **Last Amended**: 2026-05-03

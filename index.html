@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fun Game</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: radial-gradient(
+          circle at top,
+          #f5ccff 0%,
+          #7d5bff 35%,
+          #2f1b5b 100%
+        );
+        overflow: hidden;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background:
+          radial-gradient(
+            circle at top,
+            rgba(255, 255, 255, 0.14),
+            transparent 40%
+          ),
+          linear-gradient(180deg, #2f1b5b 0%, #1d1038 45%, #12071f 100%);
+        color: #fff;
+      }
+
+      .scene {
+        position: relative;
+        width: 940px;
+        max-width: 100%;
+        min-height: 520px;
+        padding: 24px;
+        overflow: hidden;
+        border-radius: 32px;
+        border: 2px solid rgba(255, 255, 255, 0.12);
+        background: rgba(10, 4, 34, 0.92);
+        box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
+      }
+
+      .parallax {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 0;
+      }
+
+      .layer {
+        position: absolute;
+        inset: 0;
+        background-repeat: repeat-x;
+        background-size: 180px 180px;
+        opacity: 0.95;
+      }
+
+      .layer.one {
+        background-image:
+          radial-gradient(
+            circle at 20% 20%,
+            rgba(255, 255, 255, 0.45) 14%,
+            transparent 22%
+          ),
+          radial-gradient(
+            circle at 80% 40%,
+            rgba(255, 227, 183, 0.4) 14%,
+            transparent 20%
+          );
+        animation: float-slow 40s linear infinite;
+        transform: translateZ(-1px);
+      }
+
+      .layer.two {
+        background-image:
+          linear-gradient(
+            135deg,
+            rgba(248, 169, 255, 0.16) 20%,
+            transparent 20%
+          ),
+          linear-gradient(
+            225deg,
+            rgba(150, 227, 255, 0.18) 20%,
+            transparent 20%
+          );
+        animation: float-medium 24s linear infinite;
+        mix-blend-mode: screen;
+      }
+
+      .layer.three {
+        background-image: radial-gradient(
+          circle at 50% 75%,
+          rgba(248, 248, 120, 0.18),
+          transparent 28%
+        );
+        animation: float-fast 16s linear infinite;
+        mix-blend-mode: overlay;
+      }
+
+      @keyframes float-slow {
+        from {
+          background-position: 0 0;
+        }
+        to {
+          background-position: -720px 0;
+        }
+      }
+
+      @keyframes float-medium {
+        from {
+          background-position: 0 0;
+        }
+        to {
+          background-position: -1160px 0;
+        }
+      }
+
+      @keyframes float-fast {
+        from {
+          background-position: 0 0;
+        }
+        to {
+          background-position: -1520px 0;
+        }
+      }
+
+      .hud {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+      }
+
+      .scoreboard {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        font-size: 1rem;
+        letter-spacing: 0.03em;
+      }
+
+      .score-panel {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 14px 18px;
+        border-radius: 18px;
+        background: rgba(17, 9, 41, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        min-width: 164px;
+      }
+
+      .score-panel strong {
+        font-size: 1.15rem;
+        color: #ffd861;
+      }
+
+      #retryButton {
+        padding: 14px 20px;
+        border: none;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #ff84ff, #8b70ff);
+        color: #111;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(156, 107, 255, 0.28);
+        transition:
+          transform 0.2s ease,
+          filter 0.2s ease;
+      }
+
+      #retryButton:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.05);
+      }
+
+      #retryButton.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #gameCanvas {
+        width: 100%;
+        max-width: 100%;
+        aspect-ratio: 21 / 10;
+        display: block;
+        border-radius: 24px;
+        background: linear-gradient(
+          180deg,
+          rgba(32, 15, 70, 0.95),
+          rgba(6, 2, 20, 0.98)
+        );
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+          0 28px 40px rgba(0, 0, 0, 0.25);
+        cursor: pointer;
+      }
+
+      .hint {
+        margin-top: 12px;
+        color: #d9d9ff;
+        font-size: 0.95rem;
+        opacity: 0.95;
+        max-width: 880px;
+        line-height: 1.6;
+      }
+
+      .hint strong {
+        color: #ff88ff;
+      }
+
+      @media (max-width: 640px) {
+        .scene {
+          padding: 18px;
+        }
+        .hud {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        #retryButton {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scene">
+      <div class="parallax">
+        <div class="layer one"></div>
+        <div class="layer two"></div>
+        <div class="layer three"></div>
+      </div>
+
+      <div class="hud">
+        <div class="scoreboard">
+          <div class="score-panel">
+            <span>Score</span>
+            <strong id="scoreValue">0</strong>
+          </div>
+          <div class="score-panel">
+            <span>High Score</span>
+            <strong id="highScoreValue">0</strong>
+          </div>
+        </div>
+        <button id="retryButton" class="hidden">Retry</button>
+      </div>
+
+      <canvas id="gameCanvas" role="img" aria-label="Fun game canvas"></canvas>
+
+      <p class="hint">
+        Jump over obstacles using <strong>Space</strong>,
+        <strong>ArrowUp</strong>, or by tapping/clicking the game area. The
+        speed increases over time, and the high score is stored locally.
+      </p>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+      const scoreValue = document.getElementById("scoreValue");
+      const highScoreValue = document.getElementById("highScoreValue");
+      const retryButton = document.getElementById("retryButton");
+      const GAME_WIDTH = 900;
+      const GAME_HEIGHT = 430;
+      const GROUND_HEIGHT = 78;
+      const STORAGE_KEY = "funGameHighScore";
+
+      let devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      let lastTime = 0;
+      let gameState = createInitialState();
+      let obstacles = [];
+      let audioContext = null;
+      let audioEnabled = true;
+
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+      setupInput();
+      loadHighScore();
+      hideRetryButton();
+      window.requestAnimationFrame(gameLoop);
+
+      function createInitialState() {
+        return {
+          currentScore: 0,
+          highScore: 0,
+          speed: 5,
+          isRunning: false,
+          isGameOver: false,
+          player: {
+            x: 120,
+            y: GAME_HEIGHT - GROUND_HEIGHT - 50,
+            width: 50,
+            height: 54,
+            velocityY: 0,
+            isJumping: false,
+          },
+          nextObstacleTimer: 0,
+        };
+      }
+
+      function resizeCanvas() {
+        canvas.width = GAME_WIDTH * devicePixelRatio;
+        canvas.height = GAME_HEIGHT * devicePixelRatio;
+        canvas.style.width = `${GAME_WIDTH}px`;
+        canvas.style.height = `${GAME_HEIGHT}px`;
+        ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      }
+
+      function setupInput() {
+        document.addEventListener("keydown", (event) => {
+          if (event.code === "Space" || event.code === "ArrowUp") {
+            event.preventDefault();
+            handleJump();
+          }
+        });
+
+        canvas.addEventListener("pointerdown", (event) => {
+          handleJump();
+        });
+
+        retryButton.addEventListener("click", () => {
+          resetGame();
+        });
+      }
+
+      function handleJump() {
+        if (!audioContext) {
+          initAudio();
+        }
+
+        if (gameState.isGameOver) {
+          return;
+        }
+
+        if (!gameState.isRunning) {
+          gameState.isRunning = true;
+          playEffect("start");
+        }
+
+        const player = gameState.player;
+        if (!player.isJumping) {
+          player.velocityY = -16;
+          player.isJumping = true;
+          playEffect("jump");
+        }
+      }
+
+      function initAudio() {
+        try {
+          audioContext = new (
+            window.AudioContext || window.webkitAudioContext
+          )();
+          audioContext.resume();
+        } catch (error) {
+          audioEnabled = false;
+        }
+      }
+
+      function playEffect(type) {
+        if (!audioEnabled || !audioContext) return;
+
+        const now = audioContext.currentTime;
+        const gain = audioContext.createGain();
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.connect(audioContext.destination);
+
+        const oscillator = audioContext.createOscillator();
+        oscillator.type =
+          type === "jump" ? "triangle" : type === "hit" ? "square" : "sawtooth";
+
+        if (type === "jump") {
+          oscillator.frequency.setValueAtTime(660, now);
+          gain.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+          oscillator.connect(gain);
+          oscillator.start(now);
+          oscillator.stop(now + 0.18);
+        } else if (type === "hit") {
+          oscillator.frequency.setValueAtTime(200, now);
+          oscillator.frequency.exponentialRampToValueAtTime(90, now + 0.18);
+          gain.gain.exponentialRampToValueAtTime(0.16, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+          oscillator.connect(gain);
+          oscillator.start(now);
+          oscillator.stop(now + 0.28);
+        } else if (type === "gameover") {
+          oscillator.frequency.setValueAtTime(220, now);
+          oscillator.frequency.exponentialRampToValueAtTime(120, now + 0.35);
+          gain.gain.exponentialRampToValueAtTime(0.16, now + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+          oscillator.connect(gain);
+          oscillator.start(now);
+          oscillator.stop(now + 0.45);
+        } else if (type === "start") {
+          oscillator.frequency.setValueAtTime(420, now);
+          gain.gain.exponentialRampToValueAtTime(0.1, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+          oscillator.connect(gain);
+          oscillator.start(now);
+          oscillator.stop(now + 0.18);
+        }
+      }
+
+      function loadHighScore() {
+        try {
+          const saved = window.localStorage.getItem(STORAGE_KEY);
+          gameState.highScore = saved ? Number(saved) || 0 : 0;
+        } catch (error) {
+          gameState.highScore = 0;
+        }
+        highScoreValue.textContent = gameState.highScore;
+      }
+
+      function saveHighScore() {
+        try {
+          window.localStorage.setItem(STORAGE_KEY, String(gameState.highScore));
+        } catch (error) {
+          // localStorage may be unavailable
+        }
+      }
+
+      function resetGame() {
+        obstacles = [];
+        gameState = createInitialState();
+        loadHighScore();
+        lastTime = performance.now();
+        hideRetryButton();
+        canvas.focus();
+      }
+
+      function showRetryButton() {
+        retryButton.classList.remove("hidden");
+      }
+
+      function hideRetryButton() {
+        retryButton.classList.add("hidden");
+      }
+
+      function gameLoop(timestamp) {
+        const deltaTime = Math.min((timestamp - lastTime) / 16.67, 2);
+        lastTime = timestamp;
+
+        updateGame(Math.max(deltaTime, 0.5));
+        renderGame();
+        window.requestAnimationFrame(gameLoop);
+      }
+
+      function updateGame(delta) {
+        if (!gameState.isRunning || gameState.isGameOver) return;
+
+        const player = gameState.player;
+        const baseSpeed = 5;
+        gameState.speed = baseSpeed + Math.floor(gameState.currentScore / 120);
+        gameState.nextObstacleTimer -= delta;
+
+        if (gameState.nextObstacleTimer <= 0) {
+          obstacles.push(createObstacle(gameState.speed));
+          gameState.nextObstacleTimer = 70 + Math.random() * 90;
+        }
+
+        player.velocityY += 0.75;
+        player.y += player.velocityY;
+
+        if (player.y >= GAME_HEIGHT - GROUND_HEIGHT - player.height) {
+          player.y = GAME_HEIGHT - GROUND_HEIGHT - player.height;
+          player.velocityY = 0;
+          player.isJumping = false;
+        }
+
+        obstacles = obstacles.filter((obstacle) => {
+          obstacle.x -= gameState.speed * delta * 0.9;
+          return obstacle.x + obstacle.width > -20;
+        });
+
+        obstacles.forEach((obstacle) => {
+          if (checkCollision(player, obstacle)) {
+            triggerGameOver();
+          }
+        });
+
+        if (!gameState.isGameOver) {
+          gameState.currentScore += gameState.speed * delta * 0.16;
+          scoreValue.textContent = Math.floor(gameState.currentScore);
+        }
+      }
+
+      function createObstacle(speed) {
+        const width = 32 + Math.random() * 30;
+        const height = 48 + Math.random() * 42;
+        const y = GAME_HEIGHT - GROUND_HEIGHT - height;
+        return {
+          x: GAME_WIDTH + 30,
+          y,
+          width,
+          height,
+          color: getObstacleColor(),
+          spikes: Math.floor(3 + Math.random() * 3),
+          speed,
+        };
+      }
+
+      function getObstacleColor() {
+        const colors = ["#ff8b9a", "#89ff8b", "#9effff", "#ffef8a", "#db8bff"];
+        return colors[Math.floor(Math.random() * colors.length)];
+      }
+
+      function checkCollision(player, obstacle) {
+        return (
+          player.x < obstacle.x + obstacle.width - 4 &&
+          player.x + player.width - 8 > obstacle.x &&
+          player.y < obstacle.y + obstacle.height - 4 &&
+          player.y + player.height > obstacle.y + 6
+        );
+      }
+
+      function triggerGameOver() {
+        if (gameState.isGameOver) return;
+        gameState.isGameOver = true;
+        gameState.isRunning = false;
+        playEffect("hit");
+        setTimeout(() => playEffect("gameover"), 80);
+        const finalScore = Math.floor(gameState.currentScore);
+        if (finalScore > gameState.highScore) {
+          gameState.highScore = finalScore;
+          saveHighScore();
+        }
+        scoreValue.textContent = finalScore;
+        highScoreValue.textContent = gameState.highScore;
+        showRetryButton();
+      }
+
+      function renderGame() {
+        ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        drawSky();
+        drawGround();
+        obstacles.forEach(drawObstacle);
+        drawPlayer(gameState.player);
+        drawOverlay();
+      }
+
+      function drawSky() {
+        const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+        gradient.addColorStop(0, "rgba(47, 22, 91, 0.26)");
+        gradient.addColorStop(0.6, "rgba(13, 5, 36, 0.12)");
+        gradient.addColorStop(1, "rgba(8, 3, 18, 0.88)");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+      }
+
+      function drawGround() {
+        const baseY = GAME_HEIGHT - GROUND_HEIGHT;
+        ctx.fillStyle = "#1a0f35";
+        ctx.fillRect(0, baseY, GAME_WIDTH, GROUND_HEIGHT);
+
+        for (let i = 0; i < GAME_WIDTH; i += 56) {
+          ctx.beginPath();
+          ctx.moveTo(i, baseY);
+          ctx.lineTo(i + 24, baseY + 12);
+          ctx.lineTo(i + 48, baseY);
+          ctx.fillStyle = "rgba(255,255,255,0.05)";
+          ctx.fill();
+        }
+      }
+
+      function drawPlayer(player) {
+        const bodyX = player.x;
+        const bodyY = player.y;
+        ctx.save();
+        ctx.translate(bodyX + player.width / 2, bodyY + player.height / 2);
+        ctx.rotate(player.velocityY * 0.015);
+        ctx.translate(-player.width / 2, -player.height / 2);
+
+        ctx.fillStyle = "#ffb864";
+        ctx.strokeStyle = "#3e1c57";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(10, player.height - 8);
+        ctx.quadraticCurveTo(12, 10, player.width - 10, 14);
+        ctx.quadraticCurveTo(
+          player.width + 4,
+          32,
+          player.width - 14,
+          player.height - 6,
+        );
+        ctx.lineTo(10, player.height - 8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#ffe7a6";
+        ctx.beginPath();
+        ctx.ellipse(player.width / 2, 22, 18, 16, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#3a224b";
+        ctx.beginPath();
+        ctx.arc(26, 24, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(42, 24, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = "#3e1c57";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(32, 36);
+        ctx.quadraticCurveTo(40, 46, 48, 36);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawObstacle(obstacle) {
+        ctx.fillStyle = obstacle.color;
+        ctx.strokeStyle = "#33095b";
+        ctx.lineWidth = 3;
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        ctx.strokeRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+
+        const spikeCount = obstacle.spikes;
+        const spikeWidth = obstacle.width / spikeCount;
+        ctx.fillStyle = "#ffe7a6";
+        for (let i = 0; i < spikeCount; i++) {
+          const spikeX = obstacle.x + i * spikeWidth;
+          ctx.beginPath();
+          ctx.moveTo(spikeX + 4, obstacle.y + 6);
+          ctx.lineTo(spikeX + spikeWidth / 2, obstacle.y - 16);
+          ctx.lineTo(spikeX + spikeWidth - 4, obstacle.y + 6);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        ctx.fillStyle = "#3e1c57";
+        ctx.beginPath();
+        ctx.arc(
+          obstacle.x + obstacle.width * 0.3,
+          obstacle.y + obstacle.height * 0.4,
+          5,
+          0,
+          Math.PI * 2,
+        );
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(
+          obstacle.x + obstacle.width * 0.7,
+          obstacle.y + obstacle.height * 0.4,
+          5,
+          0,
+          Math.PI * 2,
+        );
+        ctx.fill();
+      }
+
+      function drawOverlay() {
+        if (!gameState.isRunning && !gameState.isGameOver) {
+          ctx.fillStyle = "rgba(11, 6, 32, 0.65)";
+          ctx.fillRect(92, 118, 360, 120);
+          ctx.fillStyle = "#f9f3ff";
+          ctx.font = '600 22px "Segoe UI", sans-serif';
+          ctx.fillText("Tap, click, or press Space/Up to jump!", 118, 162);
+          ctx.font = '500 16px "Segoe UI", sans-serif';
+          ctx.fillText(
+            "Survive as long as possible while the speed climbs.",
+            118,
+            198,
+          );
+        }
+
+        if (gameState.isGameOver) {
+          ctx.fillStyle = "rgba(10, 3, 28, 0.76)";
+          ctx.fillRect(140, 146, 560, 152);
+          ctx.fillStyle = "#ffde9b";
+          ctx.font = '700 44px "Segoe UI", sans-serif';
+          ctx.fillText("Game Over", 280, 206);
+          ctx.font = '500 18px "Segoe UI", sans-serif';
+          ctx.fillStyle = "#f6f4ff";
+          ctx.fillText("Try again to beat your high score.", 280, 248);
+        }
+      }
+    </script>
+  </body>
+</html>
